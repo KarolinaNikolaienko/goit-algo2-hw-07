@@ -1,5 +1,7 @@
-from model.LRUCache import LRUCache
+import time
 
+from model.LRUCache import LRUCache
+import random
 
 # NO CACHE
 def range_sum_no_cache(array: list, L: int, R: int):
@@ -37,10 +39,39 @@ def update_with_cache(array: list, index: int, value) -> None:
 
 if __name__ == "__main__":
 
-    arr = [1,2,3,4]
-    print(range_sum_with_cache(arr, 1, 3))
-    print(range_sum_with_cache(arr, 0, 4))
-    print(cache.cache)
-    update_with_cache(arr, 0, 9)
-    print(arr)
-    print(cache.cache)
+    arr = []
+    requests = []
+    for i in range(100000):
+        if i < 50000: # generating requests
+            func = random.choice(["Range","Update"])
+            if func == "Range":
+                L = random.randint(0, 100000)
+                R = random.randint(L, 100000)
+                requests.append((func, L, R))
+            else:
+                index = random.randint(0, 100000)
+                value = random.randint(-100, 100)
+                requests.append((func, index, value))
+        arr.append(random.randint(-100, 100)) # generating array
+
+
+    # For NO CACHE
+    start = time.time()
+    for (func, i, j) in requests:
+        if func == "Range":
+            range_sum_no_cache(arr, i, j)
+        else:
+            update_no_cache(arr, i, j)
+    exe_time_no_cache = time.time() - start
+
+    # For WITH CACHE
+    start = time.time()
+    for (func, i, j) in requests:
+        if func == "Range":
+            range_sum_with_cache(arr, i, j)
+        else:
+            update_with_cache(arr, i, j)
+    exe_time_with_cache = time.time() - start
+
+    print(f"Час виконання без кешування: {exe_time_no_cache} секунд")
+    print(f"Час виконання з LRU-кешем: {exe_time_with_cache} секунд")
